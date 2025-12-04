@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nüfus Grafiği</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database.js"></script>
+    
+    <!-- Chart.js için -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        canvas {
+            width: 80%;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Başlık kısmı burada değiştirildi -->
+    <h1>Nüfus Grafiği</h1>
+    <canvas id="myChart" width="400" height="200"></canvas>
+    
+    <script src="app.js"></script> <!-- JavaScript dosyasını burada ekliyoruz -->
+</body>
+</html>
