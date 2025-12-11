@@ -50,6 +50,25 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
         }
 
+        .report-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e3f2fd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .report-title {
+            font-size: 1.5rem;
+            color: #3f51b5;
+            margin-bottom: 10px;
+        }
+
+        .report-text {
+            font-size: 1.1rem;
+            color: #555;
+        }
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 2rem;
@@ -65,10 +84,39 @@
     <div class="container">
         <h1>Nüfus Grafiği</h1>
         <canvas id="myChart" width="400" height="200"></canvas>
+        
+        <!-- Dinamik rapor bölümü -->
+        <div class="report-section">
+            <h2 class="report-title">Son Durum Raporu</h2>
+            <p id="report-text" class="report-text">Yükleniyor...</p>
+        </div>
     </div>
+
+    <script>
+        // Sahte raporlar
+        const reports = [
+            "Bugün şehirdeki nüfus artışı %3 oranında oldu.",
+            "Son 24 saatte 1.200 yeni kişi kaydedildi.",
+            "Bu hafta içinde nüfus sayısı 10.000 artış gösterdi.",
+            "Önümüzdeki 5 yıl için tahmin edilen nüfus artışı %12.",
+            "Yeni nüfus verileri, geçen yıla göre %2 oranında bir artış gösteriyor.",
+            "Yerel yönetim, nüfus yoğunluğunu dengelemek için yeni planlar hazırlıyor."
+        ];
+
+        // Raporu her 5 saniyede bir değiştirme fonksiyonu
+        function updateReport() {
+            const randomIndex = Math.floor(Math.random() * reports.length);
+            const reportText = reports[randomIndex];
+            document.getElementById('report-text').innerText = reportText;
+        }
+
+        // İlk raporun yüklenmesi
+        updateReport();
+
+        // Her 5 saniyede bir raporu yenile
+        setInterval(updateReport, 5000);
+    </script>
 
     <script src="app.js"></script> <!-- JavaScript dosyasını burada ekliyoruz -->
 </body>
 </html>
-
-
