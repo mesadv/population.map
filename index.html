@@ -13,22 +13,62 @@
 
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f7fc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        .container {
             text-align: center;
-            padding: 20px;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 1000px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #4CAF50;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
         canvas {
-            width: 80%;
-            margin: 0 auto;
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Başlık kısmı burada değiştirildi -->
-    <h1>Nüfus Grafiği</h1>
-    <canvas id="myChart" width="400" height="200"></canvas>
-    
+    <div class="container">
+        <h1>Nüfus Grafiği</h1>
+        <canvas id="myChart" width="400" height="200"></canvas>
+    </div>
+
     <script src="app.js"></script> <!-- JavaScript dosyasını burada ekliyoruz -->
 </body>
 </html>
+
+
