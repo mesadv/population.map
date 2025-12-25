@@ -7,9 +7,6 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database.js"></script>
-    
-    <!-- Chart.js için -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
 
     <style>
         body {
@@ -28,10 +25,11 @@
             text-align: center;
             padding: 30px;
             background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             width: 90%;
             max-width: 1000px;
+            overflow: hidden;
         }
 
         h1 {
@@ -42,21 +40,12 @@
             text-transform: uppercase;
         }
 
-        canvas {
-            max-width: 100%;
-            height: auto;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-            margin-bottom: 30px; /* Aradaki mesafeyi artırdık */
-        }
-
         .report-section {
             margin-top: 30px;
             padding: 20px;
             background-color: #e3f2fd;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .report-title {
@@ -68,6 +57,7 @@
         .report-text {
             font-size: 1.1rem;
             color: #555;
+            line-height: 1.6;
         }
 
         @media (max-width: 768px) {
@@ -78,14 +68,16 @@
             .container {
                 padding: 20px;
             }
+
+            .report-title {
+                font-size: 1.2rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Nüfus Grafiği</h1>
-        <canvas id="myChart" width="400" height="200"></canvas> <!-- Mevcut grafik -->
-        <canvas id="myBarChart" width="400" height="200"></canvas> <!-- Yeni çubuk grafik -->
+        <h1>Nüfus Raporu</h1>
 
         <!-- Dinamik rapor bölümü -->
         <div class="report-section">
@@ -117,55 +109,6 @@
 
         // Her 5 saniyede bir raporu yenile
         setInterval(updateReport, 5000);
-
-        // İlk grafik (Line Chart) için veri
-        const ctx1 = document.getElementById('myChart').getContext('2d');
-        const myChart = new Chart(ctx1, {
-            type: 'line',
-            data: {
-                labels: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran'],
-                datasets: [{
-                    label: 'Nüfus Artışı',
-                    data: [1000, 1500, 1800, 2000, 2300, 2500],
-                    borderColor: '#4CAF50',
-                    backgroundColor: 'rgba(76, 175, 80, 0.2)',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-
-        // Yeni grafik (Bar Chart) için veri
-        const ctx2 = document.getElementById('myBarChart').getContext('2d');
-        const myBarChart = new Chart(ctx2, {
-            type: 'bar',
-            data: {
-                labels: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran'],
-                datasets: [{
-                    label: 'Nüfus Dağılımı',
-                    data: [1000, 1500, 1800, 2000, 2300, 2500],
-                    backgroundColor: '#3f51b5',
-                    borderColor: '#2c387e',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-
     </script>
-
-    <script src="app.js"></script> <!-- JavaScript dosyasını burada ekliyoruz -->
 </body>
 </html>
