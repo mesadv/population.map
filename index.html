@@ -127,7 +127,7 @@
         loadingMsg.style.color = "#333";
         container.appendChild(loadingMsg);
 
-        const refBinalar = database.ref('sites/binalar');
+        const refBinalar = database.ref('binalar');
         refBinalar.once('value')
             .then(snapshot => {
                 container.innerHTML = ''; // loading mesajını kaldır
