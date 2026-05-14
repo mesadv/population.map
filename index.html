@@ -95,6 +95,7 @@ h1 {
 </div>
 
 <script type="module">
+// Firebase import
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
 import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-analytics.js";
@@ -145,7 +146,7 @@ async function fetchBinalar() {
   }
 }
 
-// Başlangıçta çek
+// Başlangıçta veri çek
 fetchBinalar();
 
 // Refresh butonu
