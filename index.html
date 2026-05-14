@@ -1,111 +1,129 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Binalar</title>
-    <!-- Firebase SDK (compat sürüm) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Binalar Dashboard</title>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: #f4f7fc;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            color: #333;
-        }
+<!-- Firebase SDK (compat) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
-        .container {
-            width: 90%;
-            max-width: 600px;
-            margin-top: 50px;
-            padding: 30px;
-            background-color: #fff;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f4f7fc;
+        display: flex;
+        justify-content: center;
+        min-height: 100vh;
+    }
 
-        h1 {
-            font-size: 2.5rem;
-            color: #4CAF50;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-        }
+    .container {
+        width: 95%;
+        max-width: 900px;
+        margin: 50px 0;
+    }
 
-        ul {
-            list-style-type: disc;
-            padding-left: 20px;
-            font-size: 1.2rem;
-        }
+    h1 {
+        text-align: center;
+        color: #4CAF50;
+        margin-bottom: 30px;
+        text-transform: uppercase;
+    }
 
-        li {
-            margin-bottom: 10px;
-        }
-    </style>
+    .bina-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 20px;
+    }
+
+    .bina-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        text-align: center;
+        transition: transform 0.2s;
+    }
+
+    .bina-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .bina-name {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .bina-count {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #4CAF50;
+    }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>Binalar</h1>
-        <ul id="bina-listesi">
-            <!-- Firebase’den veri geldikçe buraya liste eklenecek -->
-        </ul>
-
-        <script>
-            // 🔹 Firebase config (kendi Firebase projen ile değiştir)
-            const firebaseConfig = {
-                apiKey: "AIzaSyCVp9jSagLcb8v6Ei2dhmpQrJAWSYxgZ48",
-                authDomain: "populationmap-48dd0.firebaseapp.com",
-                databaseURL: "https://populationmap-48dd0-default-rtdb.firebaseio.com",
-                projectId: "populationmap-48dd0",
-                storageBucket: "populationmap-48dd0.firebasestorage.app",
-                messagingSenderId: "387203070252",
-                appId: "1:387203070252:web:b0ed4f1ff520f6f2bc5489",
-                measurementId: "G-1SSDYP5N25"
-            };
-
-            // Firebase başlat
-            const app = firebase.initializeApp(firebaseConfig);
-            const database = firebase.database();
-
-            // Firebase’den veri çekme fonksiyonu
-            function fetchBinalar() {
-                const binalarRef = database.ref('binalar');
-                binalarRef.on('value', (snapshot) => {
-                    const data = snapshot.val();
-                    const ul = document.getElementById('bina-listesi');
-                    ul.innerHTML = ''; // önce temizle
-
-                    if (data) {
-                        Object.keys(data).forEach((bina) => {
-                            const li = document.createElement('li');
-                            li.textContent = bina + ' - Kişi Sayısı: ' + (data[bina].sayac || 0);
-                            ul.appendChild(li);
-                        });
-                    }
-                });
-            }
-
-            // Firebase yoksa test için statik veri
-            function loadStaticBinalar() {
-                const ul = document.getElementById('bina-listesi');
-                ul.innerHTML = '';
-                ["Bina 1", "Bina 2", "Bina 3"].forEach((bina) => {
-                    const li = document.createElement('li');
-                    li.textContent = bina;
-                    ul.appendChild(li);
-                });
-            }
-
-            // 🔹 Firebase aktif
-            fetchBinalar();
-            // Eğer Firebase kullanmak istemezsen loadStaticBinalar(); yazabilirsin
-        </script>
+<div class="container">
+    <h1>Binalar</h1>
+    <div class="bina-grid" id="bina-listesi">
+        <!-- Binalar buraya eklenecek -->
     </div>
+</div>
+
+<script>
+    // 🔹 Firebase config
+    const firebaseConfig = {
+        apiKey: "AIzaSyCVp9jSagLcb8v6Ei2dhmpQrJAWSYxgZ48",
+        authDomain: "populationmap-48dd0.firebaseapp.com",
+        databaseURL: "https://populationmap-48dd0-default-rtdb.firebaseio.com",
+        projectId: "populationmap-48dd0",
+        storageBucket: "populationmap-48dd0.firebasestorage.app",
+        messagingSenderId: "387203070252",
+        appId: "1:387203070252:web:b0ed4f1ff520f6f2bc5489",
+        measurementId: "G-1SSDYP5N25"
+    };
+
+    // Firebase başlat
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Binaları çek ve görselleştir
+    function fetchBinalar() {
+        const refBinalar = database.ref('binalar');
+        refBinalar.on('value', snapshot => {
+            const data = snapshot.val();
+            const container = document.getElementById('bina-listesi');
+            container.innerHTML = ''; // önce temizle
+
+            if (data) {
+                Object.keys(data).forEach(bina => {
+                    const count = data[bina].sayac || 0;
+
+                    const card = document.createElement('div');
+                    card.className = 'bina-card';
+
+                    const nameEl = document.createElement('div');
+                    nameEl.className = 'bina-name';
+                    nameEl.textContent = bina;
+
+                    const countEl = document.createElement('div');
+                    countEl.className = 'bina-count';
+                    countEl.textContent = count;
+
+                    card.appendChild(nameEl);
+                    card.appendChild(countEl);
+                    container.appendChild(card);
+                });
+            }
+        });
+    }
+
+    fetchBinalar();
+</script>
 </body>
 </html>
