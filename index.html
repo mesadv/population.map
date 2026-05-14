@@ -1,3 +1,102 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Binalar Dashboard</title>
+
+<!-- Firebase SDK (compat) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f4f7fc;
+        display: flex;
+        justify-content: center;
+        min-height: 100vh;
+    }
+
+    .container {
+        width: 95%;
+        max-width: 900px;
+        margin: 50px 0;
+    }
+
+    h1 {
+        text-align: center;
+        color: #4CAF50;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+    }
+
+    .refresh-container {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    #refresh-btn {
+        padding: 10px 20px;
+        font-size: 1rem;
+        background-color: #4CAF50;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    #refresh-btn:hover {
+        background-color: #45a049;
+    }
+
+    .bina-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 20px;
+    }
+
+    .bina-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        text-align: center;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .bina-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .bina-name {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .bina-count {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #4CAF50;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Binalar</h1>
+    <div class="refresh-container">
+        <button id="refresh-btn">Yenile</button>
+    </div>
+    <div class="bina-grid" id="bina-listesi">
+        <!-- Binalar buraya eklenecek -->
+    </div>
+</div>
 
 <script>
     // 🔹 Firebase config
@@ -16,58 +115,74 @@
     const app = firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // Binaları çek ve görselleştir
     function fetchBinalar() {
-        const refBinalar = database.ref('binalar');
-        refBinalar.on('value', snapshot => {
-            const data = snapshot.val();
-            const container = document.getElementById('bina-listesi');
-            container.innerHTML = ''; // önce temizle
+        const container = document.getElementById('bina-listesi');
+        container.innerHTML = '';
 
-            if (!data) {
-                // Veri yoksa mesaj göster
+        // 🔹 Yükleniyor mesajı
+        const loadingMsg = document.createElement('div');
+        loadingMsg.textContent = "Veriler yükleniyor...";
+        loadingMsg.style.textAlign = "center";
+        loadingMsg.style.fontSize = "1.2rem";
+        loadingMsg.style.color = "#333";
+        container.appendChild(loadingMsg);
+
+        const refBinalar = database.ref('binalar');
+        refBinalar.once('value')
+            .then(snapshot => {
+                container.innerHTML = ''; // loading mesajını kaldır
+
+                const data = snapshot.val();
+
+                if (!data) {
+                    const msg = document.createElement('div');
+                    msg.textContent = "Hiç bina bulunamadı.";
+                    msg.style.textAlign = "center";
+                    msg.style.fontSize = "1.2rem";
+                    msg.style.color = "#777";
+                    container.appendChild(msg);
+                    return;
+                }
+
+                // Veri varsa kartları oluştur
+                Object.keys(data).forEach(bina => {
+                    const count = Number(data[bina].sayac) || 0;
+
+                    const card = document.createElement('div');
+                    card.className = 'bina-card';
+
+                    const nameEl = document.createElement('div');
+                    nameEl.className = 'bina-name';
+                    nameEl.textContent = bina;
+
+                    const countEl = document.createElement('div');
+                    countEl.className = 'bina-count';
+                    countEl.textContent = count;
+
+                    card.appendChild(nameEl);
+                    card.appendChild(countEl);
+                    container.appendChild(card);
+                });
+            })
+            .catch(error => {
+                container.innerHTML = '';
                 const msg = document.createElement('div');
-                msg.textContent = "Hiç bina bulunamadı.";
+                msg.textContent = "Veriler alınamadı. Lütfen daha sonra tekrar deneyin.";
                 msg.style.textAlign = "center";
                 msg.style.fontSize = "1.2rem";
-                msg.style.color = "#777";
+                msg.style.color = "#f44336";
                 container.appendChild(msg);
-                return;
-            }
-
-            // Veri varsa kartları oluştur
-            Object.keys(data).forEach(bina => {
-                // Sayacı güvenli şekilde al
-                const count = Number(data[bina].sayac) || 0;
-
-                const card = document.createElement('div');
-                card.className = 'bina-card';
-
-                const nameEl = document.createElement('div');
-                nameEl.className = 'bina-name';
-                nameEl.textContent = bina;
-
-                const countEl = document.createElement('div');
-                countEl.className = 'bina-count';
-                countEl.textContent = count;
-
-                card.appendChild(nameEl);
-                card.appendChild(countEl);
-                container.appendChild(card);
+                console.error("Firebase hatası:", error);
             });
-        }, error => {
-            // Hata olursa kullanıcıya göster
-            const container = document.getElementById('bina-listesi');
-            container.innerHTML = '';
-            const msg = document.createElement('div');
-            msg.textContent = "Veriler alınamadı. Lütfen daha sonra tekrar deneyin.";
-            msg.style.textAlign = "center";
-            msg.style.fontSize = "1.2rem";
-            msg.style.color = "#f44336"; // kırmızı uyarı rengi
-            container.appendChild(msg);
-            console.error("Firebase hatası:", error);
-        });
     }
 
+    // Sayfa yüklendiğinde veri çek
     fetchBinalar();
+
+    // 🔹 Yenile butonu
+    document.getElementById('refresh-btn').addEventListener('click', () => {
+        fetchBinalar();
+    });
 </script>
+</body>
+</html>
