@@ -23,7 +23,7 @@
 
         .container {
             width: 90%;
-            max-width: 1000px;
+            max-width: 600px;
             margin-top: 50px;
             padding: 30px;
             background-color: #fff;
@@ -37,13 +37,25 @@
             margin-bottom: 20px;
             text-transform: uppercase;
         }
+
+        ul {
+            list-style-type: disc;
+            padding-left: 20px;
+            font-size: 1.2rem;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Binalar</h1>
+        <ul id="bina-listesi">
+            <!-- Firebase’den veri geldikçe buraya liste eklenecek -->
+        </ul>
 
-        <!-- Firebase’den veri çekeceğin değişkenler burada tanımlanacak -->
         <script>
             // Firebase konfigürasyonunu buraya ekle
             const firebaseConfig = {
@@ -62,26 +74,41 @@
 
             // Binalar ile ilgili değişkenler
             let binalarListesi = [];       // Firebase’den çekilecek binalar listesi
-            let toplamBinaSayisi = 0;      // Firebase’den alınan toplam bina sayısı
-            let aktifBinaDurumu = {};      // Örn: { "Bina1": "aktif", "Bina2": "boş" }
 
             // Örnek: Firebase’den veri çekme fonksiyonu
             function fetchBinalar() {
                 const binalarRef = firebase.database().ref('binalar');
                 binalarRef.on('value', (snapshot) => {
                     const data = snapshot.val();
-                    // Burada veriyi değişkenlere aktarabilirsin
                     binalarListesi = data ? Object.keys(data) : [];
-                    toplamBinaSayisi = binalarListesi.length;
-                    aktifBinaDurumu = data || {};
-                    console.log("Binalar yüklendi:", binalarListesi);
-                    console.log("Toplam bina sayısı:", toplamBinaSayisi);
-                    console.log("Bina durumları:", aktifBinaDurumu);
+
+                    // HTML listesine ekle
+                    const ul = document.getElementById('bina-listesi');
+                    ul.innerHTML = ''; // Önce temizle
+                    binalarListesi.forEach((bina, index) => {
+                        const li = document.createElement('li');
+                        li.textContent = bina; // Örn: "Bina 1"
+                        ul.appendChild(li);
+                    });
                 });
             }
 
-            // Fonksiyonu çağır
-            fetchBinalar();
+            // Örnek statik veri (Firebase yoksa test için)
+            function loadStaticBinalar() {
+                binalarListesi = ["Bina 1", "Bina 2", "Bina 3"];
+                const ul = document.getElementById('bina-listesi');
+                ul.innerHTML = '';
+                binalarListesi.forEach((bina) => {
+                    const li = document.createElement('li');
+                    li.textContent = bina;
+                    ul.appendChild(li);
+                });
+            }
+
+            // Fonksiyonları çağır
+            // Eğer Firebase hazırsa fetchBinalar(); kullan, yoksa loadStaticBinalar();
+            loadStaticBinalar();
+            // fetchBinalar(); // Firebase kullanıyorsan bunu aç
         </script>
     </div>
 </body>
