@@ -5,10 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Binalar Dashboard</title>
 
-<!-- Firebase SDK (compat) -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-
 <style>
 body {
   font-family: Arial, sans-serif;
@@ -98,79 +94,73 @@ h1 {
     </div>
 </div>
 
-<script>
-  // 🔹 Firebase config
-  const firebaseConfig = {
-    apiKey: "AIzaSyCVp9jSagLcb8v6Ei2dhmpQrJAWSYxgZ48",
-    authDomain: "populationmap-48dd0.firebaseapp.com",
-    databaseURL: "https://populationmap-48dd0-default-rtdb.firebaseio.com",
-    projectId: "populationmap-48dd0",
-    storageBucket: "populationmap-48dd0.firebasestorage.app",
-    messagingSenderId: "387203070252",
-    appId: "1:387203070252:web:b0ed4f1ff520f6f2bc5489",
-    measurementId: "G-1SSDYP5N25"
-  };
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-analytics.js";
 
-  // Firebase başlat
-  const app = firebase.initializeApp(firebaseConfig);
-  const database = firebase.database();
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyCVp9jSagLcb8v6Ei2dhmpQrJAWSYxgZ48",
+  authDomain: "populationmap-48dd0.firebaseapp.com",
+  databaseURL: "https://populationmap-48dd0-default-rtdb.firebaseio.com",
+  projectId: "populationmap-48dd0",
+  storageBucket: "populationmap-48dd0.firebasestorage.app",
+  messagingSenderId: "387203070252",
+  appId: "1:387203070252:web:b0ed4f1ff520f6f2bc5489",
+  measurementId: "G-1SSDYP5N25"
+};
 
-  // DOM referansları
-  const container = document.getElementById('bina-listesi');
-  const refreshBtn = document.getElementById('refresh-btn');
+// Firebase initialize
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const database = getDatabase(app);
 
-  function fetchBinalar() {
+// DOM
+const container = document.getElementById('bina-listesi');
+const refreshBtn = document.getElementById('refresh-btn');
+
+async function fetchBinalar() {
+  container.innerHTML = '<div style="text-align:center; font-size:1.2rem; color:#333;">Veriler yükleniyor...</div>';
+  try {
+    const snapshot = await get(ref(database, 'binalar'));
     container.innerHTML = '';
 
-    const loadingMsg = document.createElement('div');
-    loadingMsg.textContent = "Veriler yükleniyor...";
-    loadingMsg.style.textAlign = "center";
-    loadingMsg.style.fontSize = "1.2rem";
-    loadingMsg.style.color = "#333";
-    container.appendChild(loadingMsg);
+    if (!snapshot.exists()) {
+      container.innerHTML = '<div style="text-align:center; font-size:1.2rem; color:#777;">Hiç bina bulunamadı.</div>';
+      return;
+    }
 
-    const refBinalar = database.ref('binalar');
-    refBinalar.once('value')
-      .then(snapshot => {
-        console.log("Firebase snapshot:", snapshot.val());
-        container.innerHTML = '';
-
-        const data = snapshot.val();
-        if (!data) {
-          const msg = document.createElement('div');
-          msg.textContent = "Hiç bina bulunamadı.";
-          msg.style.textAlign = "center";
-          msg.style.fontSize = "1.2rem";
-          msg.style.color = "#777";
-          container.appendChild(msg);
-          return;
-        }
-
-        Object.keys(data).forEach(bina => {
-          const count = Number(data[bina].sayac) || 0;
-          const card = document.createElement('div');
-          card.className = 'bina-card';
-          card.innerHTML = `<div class="bina-name">${bina}</div><div class="bina-count">${count}</div>`;
-          container.appendChild(card);
-        });
-      })
-      .catch(error => {
-        container.innerHTML = '';
-        const msg = document.createElement('div');
-        msg.textContent = "Veriler alınamadı. Lütfen daha sonra tekrar deneyin.";
-        msg.style.textAlign = "center";
-        msg.style.fontSize = "1.2rem";
-        msg.style.color = "#f44336";
-        container.appendChild(msg);
-        console.error("Firebase hatası:", error);
-      });
+    const data = snapshot.val();
+    Object.keys(data).forEach(bina => {
+      const count = Number(data[bina].sayac) || 0;
+      const card = document.createElement('div');
+      card.className = 'bina-card';
+      card.innerHTML = `<div class="bina-name">${bina}</div><div class="bina-count">${count}</div>`;
+      container.appendChild(card);
+    });
+  } catch (error) {
+    container.innerHTML = '<div style="text-align:center; font-size:1.2rem; color:#f44336;">Veriler alınamadı. Lütfen daha sonra tekrar deneyin.</div>';
+    console.error("Firebase hatası:", error);
   }
+}
 
-  // Başlangıçta veri çek
-  fetchBinalar();
+// Başlangıçta çek
+fetchBinalar();
 
-  // Refresh butonu
-  refreshBtn.addEventListener('click', fetchBinalar);
+// Refresh butonu
+refreshBtn.addEventListener('click', () => {
+  refreshBtn.disabled = true;
+  refreshBtn.textContent = "Yükleniyor...";
+  fetchBinalar().finally(() => {
+    refreshBtn.disabled = false;
+    refreshBtn.textContent = "Yenile";
+  });
+});
+
+// Otomatik 10 saniyede bir refresh
+setInterval(fetchBinalar, 10000);
+
 </script>
 </body>
 </html>
