@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Population Map - Grafik Paneli</title>
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Population Map - Veri Tablosu</title>
     
     <style>
         body {
@@ -20,44 +18,9 @@
             padding: 20px;
             box-sizing: border-box;
         }
-        .form-container {
-            width: 90%;
-            max-width: 800px;
-            background: white;
-            padding: 20px 30px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
-            margin-bottom: 20px;
-            display: flex;
-            gap: 15px;
-            box-sizing: border-box;
-            align-items: center;
-        }
-        .form-container input {
-            flex: 1;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            outline: none;
-        }
-        .form-container button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #3b82f6;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.2s;
-        }
-        .form-container button:hover {
-            background-color: #2563eb;
-        }
         .container {
             width: 90%;
-            max-width: 800px;
+            max-width: 600px;
             background: white;
             padding: 30px;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -68,27 +31,69 @@
             text-align: center;
             color: #1f2937;
             margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        /* Tablo Tasarımı */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background-color: #fff;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th {
+            background-color: #3b82f6;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+        }
+        tr:hover {
+            background-color: #f9fafb;
+        }
+        .loading {
+            text-align: center;
+            color: #6b7280;
+            font-style: italic;
+            padding: 20px;
+        }
+        .no-data {
+            text-align: center;
+            color: #9ca3af;
+            padding: 20px;
         }
     </style>
 </head>
 <body>
 
-    <div class="form-container">
-        <input type="text" id="dataLabel" placeholder="Zaman/Etiket (Örn: 12:00)">
-        <input type="number" id="dataValue" placeholder="Değer (Örn: 150)">
-        <button id="sendBtn">Veri Ekle</button>
-    </div>
-
     <div class="container">
-        <h1>Nüfus Haritası Veri Grafiği</h1>
-        <canvas id="myChart"></canvas>
+        <h1>Nüfus Haritası Güncel Veri Listesi</h1>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Zaman / Etiket</th>
+                    <th>Değer</th>
+                </tr>
+            </thead>
+            <tbody id="data-table-body">
+                <tr>
+                    <td colspan="2" class="loading">Veriler Firebase'den yükleniyor...</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-        // Projenizin Firebase Yapılandırması
+        // Firebase Yapılandırması
         const firebaseConfig = {
             apiKey: "AIzaSyCVp9jSagLcb8v6Ei2dhmpQrJAWSYxgZ48",
             authDomain: "populationmap-48dd0.firebaseapp.com",
@@ -103,85 +108,38 @@
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
 
-        // --- CHART.JS GRAFİK AYARLARI ---
-        const ctx = document.getElementById('myChart').getContext('2d');
-        const chart = new Chart(ctx, {
-            type: 'line', 
-            data: {
-                labels: [], // Firebase'den gelen etiketler buraya dolacak
-                datasets: [{
-                    label: 'Nüfus Verisi',
-                    data: [], // Firebase'den gelen sayısal değerler buraya dolacak
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    borderWidth: 2,
-                    tension: 0.2, 
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
+        // Tablo gövdesini seçiyoruz
+        const tableBody = document.getElementById('data-table-body');
 
-        // --- DOM ELEMANLARI ---
-        const dataLabelInput = document.getElementById('dataLabel');
-        const dataValueInput = document.getElementById('dataValue');
-        const sendBtn = document.getElementById('sendBtn');
-
-        // --- VERİ EKLEME (Firebase'e Set Etme) ---
-        sendBtn.addEventListener('click', () => {
-            const label = dataLabelInput.value.trim();
-            const value = dataValueInput.value.trim();
-
-            if (label === "" || value === "") {
-                alert("Lütfen hem etiket hem de değer alanlarını doldurun!");
-                return;
-            }
-
-            // Girilen etiketi düğüm adı (key) yaparak veriyi kaydediyoruz
-            set(ref(database, 'grafikVerileri/' + label), {
-                value: Number(value)
-            })
-            .then(() => {
-                // Ekleme başarılı olunca form alanlarını temizle
-                dataLabelInput.value = "";
-                dataValueInput.value = "";
-                console.log("Veri başarıyla kaydedildi.");
-            })
-            .catch((error) => {
-                console.error("Yazma hatası:", error);
-                alert("Veri eklenemedi. Firebase Database Rules ayarlarınızı kontrol edin!");
-            });
-        });
-
-        // --- CANLI TAKİP VE GRAFİK GÜNCELLEME (onValue) ---
+        // Canlı veri takibi yapacağımız Firebase yolu
         const dbRef = ref(database, 'grafikVerileri');
         
+        // Veritabanında her değişiklik olduğunda tablo anlık güncellenir
         onValue(dbRef, (snapshot) => {
             const data = snapshot.val();
-            const labels = [];
-            const values = [];
+            
+            // Önce tablonun içini temizle
+            tableBody.innerHTML = "";
 
             if (data) {
-                // Veritabanındaki nesneyi döngüye sokup dizilere dağıtıyoruz
+                // Firebase'den gelen nesneyi döngüye alıp satır satır tabloya basıyoruz
                 Object.keys(data).forEach((key) => {
-                    labels.push(key); 
-                    values.push(data[key].value);
+                    const row = document.createElement('tr');
+                    
+                    row.innerHTML = `
+                        <td><strong>${key}</strong></td>
+                        <td>${data[key].value}</td>
+                    `;
+                    
+                    tableBody.appendChild(row);
                 });
+            } else {
+                // Eğer veritabanında hiç veri yoksa gösterilecek mesaj
+                tableBody.innerHTML = `<tr><td colspan="2" class="no-data">Veritabanında gösterilecek veri bulunamadı.</td></tr>`;
             }
-
-            // Grafik verilerini güncelle ve yeniden çizdir
-            chart.data.labels = labels;
-            chart.data.datasets[0].data = values;
-            chart.update();
         }, (error) => {
-            console.error("Okuma hatası:", error);
+            console.error("Firebase'den veri okunurken hata oluştu: ", error);
+            tableBody.innerHTML = `<tr><td colspan="2" class="no-data" style="color: #ef4444;">Veriler alınamadı. Yetki hatası olabilir.</td></tr>`;
         });
 
     </script>
