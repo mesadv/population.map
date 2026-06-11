@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Population Map - Grafik Paneli</title>
     
-    <!-- Grafik çizimi için Chart.js CDN kütüphanesini yüklüyoruz -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
@@ -74,28 +73,117 @@
 </head>
 <body>
 
-    <!-- Veri Giriş Paneli -->
     <div class="form-container">
         <input type="text" id="dataLabel" placeholder="Zaman/Etiket (Örn: 12:00)">
         <input type="number" id="dataValue" placeholder="Değer (Örn: 150)">
         <button id="sendBtn">Veri Ekle</button>
     </div>
 
-    <!-- Grafik Alanı -->
     <div class="container">
         <h1>Nüfus Haritası Veri Grafiği</h1>
         <canvas id="myChart"></canvas>
     </div>
 
-    <!-- Firebase v10 Modülleri -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        // 'set' ve 'onValue' modüllerini de ekliyoruz [3, 4]
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-        // Proje bilgileriniz (Aktif API Anahtarlarınız entegre edildi) [1]
+        // Projenizin Firebase Yapılandırması
         const firebaseConfig = {
             apiKey: "AIzaSyCVp9jSagLcb8v6Ei2dhmpQrJAWSYxgZ48",
             authDomain: "populationmap-48dd0.firebaseapp.com",
             databaseURL: "https://populationmap-48dd0-default-rtdb.firebaseio.com",
-            projectId: "populationmap-48No response
+            projectId: "populationmap-48dd0",
+            storageBucket: "populationmap-48dd0.firebasestorage.app",
+            messagingSenderId: "387203070252",
+            appId: "1:387203070252:web:b0ed4f1ff520f6f2bc5489"
+        };
+
+        // Firebase'i Başlatıyoruz
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // --- CHART.JS GRAFİK AYARLARI ---
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line', 
+            data: {
+                labels: [], // Firebase'den gelen etiketler buraya dolacak
+                datasets: [{
+                    label: 'Nüfus Verisi',
+                    data: [], // Firebase'den gelen sayısal değerler buraya dolacak
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.2, 
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // --- DOM ELEMANLARI ---
+        const dataLabelInput = document.getElementById('dataLabel');
+        const dataValueInput = document.getElementById('dataValue');
+        const sendBtn = document.getElementById('sendBtn');
+
+        // --- VERİ EKLEME (Firebase'e Set Etme) ---
+        sendBtn.addEventListener('click', () => {
+            const label = dataLabelInput.value.trim();
+            const value = dataValueInput.value.trim();
+
+            if (label === "" || value === "") {
+                alert("Lütfen hem etiket hem de değer alanlarını doldurun!");
+                return;
+            }
+
+            // Girilen etiketi düğüm adı (key) yaparak veriyi kaydediyoruz
+            set(ref(database, 'grafikVerileri/' + label), {
+                value: Number(value)
+            })
+            .then(() => {
+                // Ekleme başarılı olunca form alanlarını temizle
+                dataLabelInput.value = "";
+                dataValueInput.value = "";
+                console.log("Veri başarıyla kaydedildi.");
+            })
+            .catch((error) => {
+                console.error("Yazma hatası:", error);
+                alert("Veri eklenemedi. Firebase Database Rules ayarlarınızı kontrol edin!");
+            });
+        });
+
+        // --- CANLI TAKİP VE GRAFİK GÜNCELLEME (onValue) ---
+        const dbRef = ref(database, 'grafikVerileri');
+        
+        onValue(dbRef, (snapshot) => {
+            const data = snapshot.val();
+            const labels = [];
+            const values = [];
+
+            if (data) {
+                // Veritabanındaki nesneyi döngüye sokup dizilere dağıtıyoruz
+                Object.keys(data).forEach((key) => {
+                    labels.push(key); 
+                    values.push(data[key].value);
+                });
+            }
+
+            // Grafik verilerini güncelle ve yeniden çizdir
+            chart.data.labels = labels;
+            chart.data.datasets[0].data = values;
+            chart.update();
+        }, (error) => {
+            console.error("Okuma hatası:", error);
+        });
+
+    </script>
+</body>
+</html>
