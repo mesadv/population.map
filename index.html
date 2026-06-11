@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Population Map - Veri Tablosu</title>
+    <title>Population Map - Bina Listesi</title>
     
     <style>
         body {
@@ -46,7 +46,7 @@
             border-bottom: 1px solid #e5e7eb;
         }
         th {
-            background-color: #3b82f6;
+            background-color: #4CAF50; /* İlk tasarımdaki yeşil tonu */
             color: white;
             font-weight: 600;
             text-transform: uppercase;
@@ -72,13 +72,13 @@
 <body>
 
     <div class="container">
-        <h1>Nüfus Haritası Güncel Veri Listesi</h1>
+        <h1>Binalar Güncel Sayaç Listesi</h1>
         
         <table>
             <thead>
                 <tr>
-                    <th>Zaman / Etiket</th>
-                    <th>Değer</th>
+                    <th>Bina Adı</th>
+                    <th>Sayaç / Nüfus</th>
                 </tr>
             </thead>
             <tbody id="data-table-body">
@@ -111,8 +111,8 @@
         // Tablo gövdesini seçiyoruz
         const tableBody = document.getElementById('data-table-body');
 
-        // Canlı veri takibi yapacağımız Firebase yolu
-        const dbRef = ref(database, 'grafikVerileri');
+        // Canlı veri takibi yapacağımız Firebase yolu ('binalar' olarak güncellendi)
+        const dbRef = ref(database, 'binalar');
         
         // Veritabanında her değişiklik olduğunda tablo anlık güncellenir
         onValue(dbRef, (snapshot) => {
@@ -122,20 +122,22 @@
             tableBody.innerHTML = "";
 
             if (data) {
-                // Firebase'den gelen nesneyi döngüye alıp satır satır tabloya basıyoruz
-                Object.keys(data).forEach((key) => {
+                // 'binalar' altındaki tüm anahtarları (bina adlarını) dönüyoruz
+                Object.keys(data).forEach((binaAdi) => {
                     const row = document.createElement('tr');
                     
+                    // Bina altındaki 'sayac' değerini alıyoruz, yoksa 0 yazıyoruz
+                    const sayacDegeri = data[binaAdi].sayac !== undefined ? data[binaAdi].sayac : 0;
+                    
                     row.innerHTML = `
-                        <td><strong>${key}</strong></td>
-                        <td>${data[key].value}</td>
+                        <td><strong>${binaAdi}</strong></td>
+                        <td>${sayacDegeri}</td>
                     `;
                     
                     tableBody.appendChild(row);
                 });
             } else {
-                // Eğer veritabanında hiç veri yoksa gösterilecek mesaj
-                tableBody.innerHTML = `<tr><td colspan="2" class="no-data">Veritabanında gösterilecek veri bulunamadı.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="2" class="no-data">Hiç bina bulunamadı.</td></tr>`;
             }
         }, (error) => {
             console.error("Firebase'den veri okunurken hata oluştu: ", error);
