@@ -91,7 +91,6 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        // Canlı (Real-time) dinleme için onValue modülünü kullanıyoruz
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
         // Firebase Yapılandırması
@@ -105,17 +104,17 @@
             appId: "1:387203070252:web:b0ed4f1ff520f6f2bc5489"
         };
 
-        // Firebase'i Başlat
+        // Firebase'i Başlatıyoruz
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
 
         // Tablo gövdesini seçiyoruz
         const tableBody = document.getElementById('data-table-body');
 
-        // DOĞRU YOL: 'veriler' yerine doğrudan 'binalar' düğümünü dinliyoruz
-        const dbRef = ref(database, 'binalar');
+        // İstediğin gibi ana düğüm adını 'veri' olarak ayarladık
+        const dbRef = ref(database, 'veri');
         
-        // onValue kullanarak 5 saniyede bir beklemek yerine, Firebase'de veri değiştiği an tabloyu güncelliyoruz
+        // Firebase Realtime Database canlı dinleme fonksiyonu
         onValue(dbRef, (snapshot) => {
             if (snapshot.exists()) {
                 const data = snapshot.val();
@@ -123,11 +122,11 @@
                 // Tabloyu her güncellemede temizle
                 tableBody.innerHTML = "";
 
-                // 'binalar' altındaki tüm alt düğümleri (Bina 1, Bina 2 vb.) döngüye sokuyoruz
+                // 'veri' altındaki tüm alt düğümleri (Bina 1, Bina 2 vb.) döngüye alıyoruz
                 Object.keys(data).forEach((binaAdi) => {
                     const row = document.createElement('tr');
                     
-                    // DOĞRU DEĞİŞKEN: data[binaAdi].value yerine data[binaAdi].sayac okuyoruz
+                    // Her binanın içindeki 'sayac' değerini okuyoruz, yoksa 0 yazıyoruz
                     const sayacDegeri = data[binaAdi].sayac !== undefined ? data[binaAdi].sayac : 0;
                     
                     row.innerHTML = `
@@ -138,11 +137,11 @@
                     tableBody.appendChild(row);
                 });
             } else {
-                tableBody.innerHTML = `<tr><td colspan="2" class="no-data">Hiç bina bulunamadı. Veritabanınızı kontrol edin.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="2" class="no-data">Hiç veri bulunamadı. Lütfen Firebase konsolunda ana düğüm adının 'veri' olduğunu doğrulayın.</td></tr>`;
             }
         }, (error) => {
             console.error("Firebase veri okuma hatası: ", error);
-            tableBody.innerHTML = `<tr><td colspan="2" class="no-data" style="color: #ef4444;">Veriler alınamadı. Rules (Kurallar) sekmesini kontrol edin!</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="2" class="no-data" style="color: #ef4444;">Veriler alınamadı. Rules ayarlarını kontrol edin!</td></tr>`;
         });
 
     </script>
