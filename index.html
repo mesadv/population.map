@@ -1,167 +1,127 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Binalar Dashboard</title>
-
-<style>
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background: #f4f7fc;
-  display: flex;
-  justify-content: center;
-  min-height: 100vh;
-}
-
-.container {
-  width: 95%;
-  max-width: 900px;
-  margin: 50px 0;
-}
-
-h1 {
-  text-align: center;
-  color: #4CAF50;
-  margin-bottom: 10px;
-  text-transform: uppercase;
-}
-
-.refresh-container {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-#refresh-btn {
-  padding: 10px 20px;
-  font-size: 1rem;
-  background-color: #4CAF50;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-#refresh-btn:hover {
-  background-color: #45a049;
-}
-
-.bina-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 20px;
-}
-
-.bina-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-  text-align: center;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.bina-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-}
-
-.bina-name {
-  font-size: 1.2rem;
-  margin-bottom: 10px;
-  font-weight: bold;
-  color: #333;
-}
-
-.bina-count {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #4CAF50;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Population Map - Grafik Paneli</title>
+    
+    <!-- Grafik çizimi için Chart.js CDN kütüphanesini yüklüyoruz -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f3f4f6;
+            margin: 0;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: white;
+            padding: 30px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+        }
+        h1 {
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-    <h1>Binalar</h1>
-    <div class="refresh-container">
-        <button id="refresh-btn">Yenile</button>
+
+    <div class="container">
+        <h1>Nüfus Haritası Veri Grafiği</h1>
+        <!-- Grafik bu Canvas elementi üzerine çizilecek -->
+        <canvas id="myChart"></canvas>
     </div>
-    <div class="bina-grid" id="bina-listesi">
-        <!-- Binalar buraya eklenecek -->
-    </div>
-</div>
 
-<script type="module">
-// Firebase import
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-analytics.js";
+    <!-- Firebase v10 Modüllerini yüklemek için type="module" kullanıyoruz -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// Firebase config
-const firebaseConfig = {
-  apiKey: "AIzaSyCVp9jSagLcb8v6Ei2dhmpQrJAWSYxgZ48",
-  authDomain: "populationmap-48dd0.firebaseapp.com",
-  databaseURL: "https://populationmap-48dd0-default-rtdb.firebaseio.com",
-  projectId: "populationmap-48dd0",
-  storageBucket: "populationmap-48dd0.firebasestorage.app",
-  messagingSenderId: "387203070252",
-  appId: "1:387203070252:web:b0ed4f1ff520f6f2bc5489",
-  measurementId: "G-1SSDYP5N25"
-};
+        // Proje bilgilerinizi içeren yapılandırma nesnesi
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVp9jSagLcb8v6Ei2dhmpQrJAWSYxgZ48", // Buraya gerçek API Key değerinizi yapıştırın [1]
+            authDomain: "populationmap-48dd0.firebaseapp.com",
+            databaseURL: "https://populationmap-48dd0-default-rtdb.firebaseio.com",
+            projectId: "populationmap-48dd0",
+            storageBucket: "populationmap-48dd0.firebasestorage.app",
+            messagingSenderId: "387203070252",
+            appId: "1:387203070252:web:b0ed4f1ff520f6f2bc5489" // Buraya gerçek Web App ID değerinizi yapıştırın [1]
+        };
 
-// Firebase initialize
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const database = getDatabase(app);
+        // Firebase'i başlat
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
 
-// DOM
-const container = document.getElementById('bina-listesi');
-const refreshBtn = document.getElementById('refresh-btn');
+        // Chart.js grafiğini oluşturma
+        const ctx = document.getElementById('myChart').getContext('2d');
+        let chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // Zaman damgaları veya anahtarlar
+                datasets: [{
+                    label: 'Anlık Veri Akışı',
+                    data: [], // Firebase'den gelen değerler
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
 
-async function fetchBinalar() {
-  container.innerHTML = '<div style="text-align:center; font-size:1.2rem; color:#333;">Veriler yükleniyor...</div>';
-  try {
-    const snapshot = await get(ref(database, 'binalar'));
-    container.innerHTML = '';
+        // Veriyi Firebase'ten çekip grafiği güncelleme fonksiyonu
+        function fetchDataAndUpdateChart() {
+            const dbRef = ref(database, 'veriler');
+            
+            get(dbRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    const labels = [];
+                    const values = [];
 
-    if (!snapshot.exists()) {
-      container.innerHTML = '<div style="text-align:center; font-size:1.2rem; color:#777;">Hiç bina bulunamadı.</div>';
-      return;
-    }
+                    // Gelen nesneyi döngüyle ayrıştırma
+                    for (let key in data) {
+                        labels.push(key); 
+                        values.push(data[key].value);
+                    }
 
-    const data = snapshot.val();
-    Object.keys(data).forEach(bina => {
-      const count = Number(data[bina].sayac) || 0;
-      const card = document.createElement('div');
-      card.className = 'bina-card';
-      card.innerHTML = `<div class="bina-name">${bina}</div><div class="bina-count">${count}</div>`;
-      container.appendChild(card);
-    });
-  } catch (error) {
-    container.innerHTML = '<div style="text-align:center; font-size:1.2rem; color:#f44336;">Veriler alınamadı. Lütfen daha sonra tekrar deneyin.</div>';
-    console.error("Firebase hatası:", error);
-  }
-}
+                    // Grafik verilerini güncelleme ve yeniden çizme
+                    chart.data.labels = labels;
+                    chart.data.datasets[0].data = values;
+                    chart.update();
+                } else {
+                    console.log("'veriler' düğümü altında hiç veri yok.");
+                }
+            }).catch((error) => {
+                console.error("Veri alınırken hata oluştu:", error);
+            });
+        }
 
-// Başlangıçta veri çek
-fetchBinalar();
+        // Sayfa ilk açıldığında veriyi bir kere çek
+        fetchDataAndUpdateChart();
 
-// Refresh butonu
-refreshBtn.addEventListener('click', () => {
-  refreshBtn.disabled = true;
-  refreshBtn.textContent = "Yükleniyor...";
-  fetchBinalar().finally(() => {
-    refreshBtn.disabled = false;
-    refreshBtn.textContent = "Yenile";
-  });
-});
-
-// Otomatik 10 saniyede bir refresh
-setInterval(fetchBinalar, 10000);
-
-</script>
+        // Her 5 saniyede bir veriyi yenile
+        setInterval(fetchDataAndUpdateChart, 5000); 
+    </script>
 </body>
 </html>
