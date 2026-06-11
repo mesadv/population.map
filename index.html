@@ -18,6 +18,43 @@
             min-height: 100vh;
             background-color: #f3f4f6;
             margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .form-container {
+            width: 90%;
+            max-width: 800px;
+            background: white;
+            padding: 20px 30px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            box-sizing: border-box;
+            align-items: center;
+        }
+        .form-container input {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            outline: none;
+        }
+        .form-container button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        .form-container button:hover {
+            background-color: #2563eb;
         }
         .container {
             width: 90%;
@@ -26,6 +63,7 @@
             padding: 30px;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             border-radius: 12px;
+            box-sizing: border-box;
         }
         h1 {
             text-align: center;
@@ -36,92 +74,28 @@
 </head>
 <body>
 
+    <!-- Veri Giriş Paneli -->
+    <div class="form-container">
+        <input type="text" id="dataLabel" placeholder="Zaman/Etiket (Örn: 12:00)">
+        <input type="number" id="dataValue" placeholder="Değer (Örn: 150)">
+        <button id="sendBtn">Veri Ekle</button>
+    </div>
+
+    <!-- Grafik Alanı -->
     <div class="container">
         <h1>Nüfus Haritası Veri Grafiği</h1>
-        <!-- Grafik bu Canvas elementi üzerine çizilecek -->
         <canvas id="myChart"></canvas>
     </div>
 
-    <!-- Firebase v10 Modüllerini yüklemek için type="module" kullanıyoruz -->
+    <!-- Firebase v10 Modülleri -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+        // 'set' ve 'onValue' modüllerini de ekliyoruz [3, 4]
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-        // Proje bilgilerinizi içeren yapılandırma nesnesi
+        // Proje bilgileriniz (Aktif API Anahtarlarınız entegre edildi) [1]
         const firebaseConfig = {
-            apiKey: "AIzaSyCVp9jSagLcb8v6Ei2dhmpQrJAWSYxgZ48", // Buraya gerçek API Key değerinizi yapıştırın [1]
+            apiKey: "AIzaSyCVp9jSagLcb8v6Ei2dhmpQrJAWSYxgZ48",
             authDomain: "populationmap-48dd0.firebaseapp.com",
             databaseURL: "https://populationmap-48dd0-default-rtdb.firebaseio.com",
-            projectId: "populationmap-48dd0",
-            storageBucket: "populationmap-48dd0.firebasestorage.app",
-            messagingSenderId: "387203070252",
-            appId: "1:387203070252:web:b0ed4f1ff520f6f2bc5489" // Buraya gerçek Web App ID değerinizi yapıştırın [1]
-        };
-
-        // Firebase'i başlat
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-
-        // Chart.js grafiğini oluşturma
-        const ctx = document.getElementById('myChart').getContext('2d');
-        let chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: [], // Zaman damgaları veya anahtarlar
-                datasets: [{
-                    label: 'Anlık Veri Akışı',
-                    data: [], // Firebase'den gelen değerler
-                    borderColor: 'rgba(59, 130, 246, 1)',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    borderWidth: 2,
-                    tension: 0.3,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: true }
-                },
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            }
-        });
-
-        // Veriyi Firebase'ten çekip grafiği güncelleme fonksiyonu
-        function fetchDataAndUpdateChart() {
-            const dbRef = ref(database, 'veriler');
-            
-            get(dbRef).then((snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    const labels = [];
-                    const values = [];
-
-                    // Gelen nesneyi döngüyle ayrıştırma
-                    for (let key in data) {
-                        labels.push(key); 
-                        values.push(data[key].value);
-                    }
-
-                    // Grafik verilerini güncelleme ve yeniden çizme
-                    chart.data.labels = labels;
-                    chart.data.datasets[0].data = values;
-                    chart.update();
-                } else {
-                    console.log("'veriler' düğümü altında hiç veri yok.");
-                }
-            }).catch((error) => {
-                console.error("Veri alınırken hata oluştu:", error);
-            });
-        }
-
-        // Sayfa ilk açıldığında veriyi bir kere çek
-        fetchDataAndUpdateChart();
-
-        // Her 5 saniyede bir veriyi yenile
-        setInterval(fetchDataAndUpdateChart, 5000); 
-    </script>
-</body>
-</html>
+            projectId: "populationmap-48No response
