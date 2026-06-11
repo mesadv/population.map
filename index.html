@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
@@ -46,7 +46,7 @@
             border-bottom: 1px solid #e5e7eb;
         }
         th {
-            background-color: #4CAF50; /* İlk tasarımdaki yeşil tonu */
+            background-color: #4CAF50; /* Yeşil Tema */
             color: white;
             font-weight: 600;
             text-transform: uppercase;
@@ -91,6 +91,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        // Canlı (Real-time) dinleme için onValue modülünü kullanıyoruz
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
         // Firebase Yapılandırması
@@ -104,29 +105,29 @@
             appId: "1:387203070252:web:b0ed4f1ff520f6f2bc5489"
         };
 
-        // Firebase'i Başlatıyoruz
+        // Firebase'i Başlat
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
 
         // Tablo gövdesini seçiyoruz
         const tableBody = document.getElementById('data-table-body');
 
-        // Canlı veri takibi yapacağımız Firebase yolu ('binalar' olarak güncellendi)
+        // DOĞRU YOL: 'veriler' yerine doğrudan 'binalar' düğümünü dinliyoruz
         const dbRef = ref(database, 'binalar');
         
-        // Veritabanında her değişiklik olduğunda tablo anlık güncellenir
+        // onValue kullanarak 5 saniyede bir beklemek yerine, Firebase'de veri değiştiği an tabloyu güncelliyoruz
         onValue(dbRef, (snapshot) => {
-            const data = snapshot.val();
-            
-            // Önce tablonun içini temizle
-            tableBody.innerHTML = "";
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                
+                // Tabloyu her güncellemede temizle
+                tableBody.innerHTML = "";
 
-            if (data) {
-                // 'binalar' altındaki tüm anahtarları (bina adlarını) dönüyoruz
+                // 'binalar' altındaki tüm alt düğümleri (Bina 1, Bina 2 vb.) döngüye sokuyoruz
                 Object.keys(data).forEach((binaAdi) => {
                     const row = document.createElement('tr');
                     
-                    // Bina altındaki 'sayac' değerini alıyoruz, yoksa 0 yazıyoruz
+                    // DOĞRU DEĞİŞKEN: data[binaAdi].value yerine data[binaAdi].sayac okuyoruz
                     const sayacDegeri = data[binaAdi].sayac !== undefined ? data[binaAdi].sayac : 0;
                     
                     row.innerHTML = `
@@ -137,11 +138,11 @@
                     tableBody.appendChild(row);
                 });
             } else {
-                tableBody.innerHTML = `<tr><td colspan="2" class="no-data">Hiç bina bulunamadı.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="2" class="no-data">Hiç bina bulunamadı. Veritabanınızı kontrol edin.</td></tr>`;
             }
         }, (error) => {
-            console.error("Firebase'den veri okunurken hata oluştu: ", error);
-            tableBody.innerHTML = `<tr><td colspan="2" class="no-data" style="color: #ef4444;">Veriler alınamadı. Yetki hatası olabilir.</td></tr>`;
+            console.error("Firebase veri okuma hatası: ", error);
+            tableBody.innerHTML = `<tr><td colspan="2" class="no-data" style="color: #ef4444;">Veriler alınamadı. Rules (Kurallar) sekmesini kontrol edin!</td></tr>`;
         });
 
     </script>
