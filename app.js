@@ -4,13 +4,13 @@ import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.
 
 // 2. Projenizin yapılandırma bilgileri (Sadece API Key ve App ID eksik)
 const firebaseConfig = {
-    apiKey: 1:387203070252:web:b0ed4f1ff520f6f2bc5489, // Firebase konsolundan alacağınız Web API Anahtarı
+    apiKey: "AIzaSyCVp9jSagLcb8v6Ei2dhmpQrJAWSYxgZ48", // Firebase konsolundan alacağınız Web API Anahtarı
     authDomain: "populationmap-48dd0.firebaseapp.com",
     databaseURL: "https://populationmap-48dd0-default-rtdb.firebaseio.com",
     projectId: "populationmap-48dd0",
     storageBucket: "populationmap-48dd0.firebasestorage.app",
     messagingSenderId: "387203070252",
-    appId: "YOUR_APP_ID" // Firebase konsolundan alacağınız Web App ID
+    appId: "1:387203070252:web:b0ed4f1ff520f6f2bc5489" // Firebase konsolundan alacağınız Web App ID
 };
 
 // 3. Firebase'i başlatıyoruz
