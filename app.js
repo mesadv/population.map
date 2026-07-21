@@ -1,4 +1,4 @@
-// 1. Gerekli modülleri CDN üzerinden içe aktarıyoruz (onValue eklendi)
+// 1. Gerekli modülleri CDN üzerinden içe aktarıyoruz
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
@@ -21,7 +21,7 @@ const database = getDatabase(app);
 const tableBody = document.getElementById('data-table-body');
 
 // 4. Veriyi 'veri' düğümünden CANLI (Real-time) olarak çekiyoruz
-const dbRef = ref(database, 'veri'); // İstediğin gibi düğüm adı 'veri' yapıldı
+const dbRef = ref(database, 'veri');
 
 onValue(dbRef, (snapshot) => {
     // Tabloyu her güncellemede temizle (eski veriler üst üste binmesin)
