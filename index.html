@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -18,32 +19,37 @@
             padding: 20px;
             box-sizing: border-box;
         }
+
         .container {
             width: 90%;
-            max-width: 600px;
+            max-width: 700px;
             background: white;
             padding: 30px;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             border-radius: 12px;
             box-sizing: border-box;
         }
+
         h1 {
             text-align: center;
             color: #1f2937;
             margin-bottom: 20px;
             font-size: 1.5rem;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
             background-color: #fff;
         }
+
         th, td {
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #e5e7eb;
         }
+
         th {
             background-color: #4CAF50;
             color: white;
@@ -52,15 +58,18 @@
             font-size: 0.85rem;
             letter-spacing: 0.05em;
         }
+
         tr:hover {
             background-color: #f9fafb;
         }
+
         .loading {
             text-align: center;
             color: #6b7280;
             font-style: italic;
             padding: 20px;
         }
+
         .no-data {
             text-align: center;
             color: #9ca3af;
@@ -68,26 +77,33 @@
         }
     </style>
 </head>
+
 <body>
 
     <div class="container">
         <h1>Binalar Güncel Sayaç Listesi</h1>
-        
+
         <table>
             <thead>
                 <tr>
                     <th>Bina Adı</th>
+                    <th>Açık Adres</th>
                     <th>Sayaç / Nüfus</th>
                 </tr>
             </thead>
+
             <tbody id="data-table-body">
                 <tr>
-                    <td colspan="2" class="loading">Veriler Firebase'den yükleniyor...</td>
+                    <td colspan="3" class="loading">
+                        Veriler Firebase'den yükleniyor...
+                    </td>
                 </tr>
             </tbody>
         </table>
     </div>
 
     <script type="module" src="app.js"></script>
+
 </body>
 </html>
+```
