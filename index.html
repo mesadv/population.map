@@ -1,12 +1,16 @@
-```html
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Population Map - Bina Listesi</title>
-    
+
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
@@ -17,23 +21,21 @@
             background-color: #f3f4f6;
             margin: 0;
             padding: 20px;
-            box-sizing: border-box;
         }
 
         .container {
-            width: 90%;
-            max-width: 700px;
+            width: 100%;
+            max-width: 900px;
             background: white;
             padding: 30px;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             border-radius: 12px;
-            box-sizing: border-box;
         }
 
         h1 {
             text-align: center;
             color: #1f2937;
-            margin-bottom: 20px;
+            margin: 0 0 20px;
             font-size: 1.5rem;
         }
 
@@ -42,12 +44,31 @@
             border-collapse: collapse;
             margin-top: 15px;
             background-color: #fff;
+            table-layout: fixed;
         }
 
-        th, td {
+        th,
+        td {
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #e5e7eb;
+            overflow-wrap: anywhere;
+        }
+
+        th:nth-child(1),
+        td:nth-child(1) {
+            width: 30%;
+        }
+
+        th:nth-child(2),
+        td:nth-child(2) {
+            width: 50%;
+        }
+
+        th:nth-child(3),
+        td:nth-child(3) {
+            width: 20%;
+            text-align: center;
         }
 
         th {
@@ -59,21 +80,43 @@
             letter-spacing: 0.05em;
         }
 
-        tr:hover {
+        tbody tr:hover {
             background-color: #f9fafb;
         }
 
-        .loading {
+        .loading,
+        .no-data {
             text-align: center;
             color: #6b7280;
-            font-style: italic;
             padding: 20px;
         }
 
-        .no-data {
-            text-align: center;
-            color: #9ca3af;
-            padding: 20px;
+        .error {
+            color: red;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.2rem;
+            }
+
+            th,
+            td {
+                padding: 10px 8px;
+                font-size: 0.85rem;
+            }
+
+            th {
+                font-size: 0.72rem;
+            }
         }
     </style>
 </head>
@@ -81,6 +124,7 @@
 <body>
 
     <div class="container">
+
         <h1>Binalar Güncel Sayaç Listesi</h1>
 
         <table>
@@ -100,10 +144,10 @@
                 </tr>
             </tbody>
         </table>
+
     </div>
 
     <script type="module" src="app.js"></script>
 
 </body>
 </html>
-```
