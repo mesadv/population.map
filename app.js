@@ -1,9 +1,10 @@
+```javascript
 // 1. Firebase modüllerini CDN üzerinden yüklüyoruz
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 
-// 2. Firebase Yapılandırması (Analytics ve Database bilgileri dahil)
+// 2. Firebase Yapılandırması
 const firebaseConfig = {
     apiKey: "AIzaSyCVp9jSagLcb8v6Ei2dhmpQrJAWSYxgZ48",
     authDomain: "populationmap-48dd0.firebaseapp.com",
@@ -15,45 +16,72 @@ const firebaseConfig = {
     measurementId: "G-1SSDYP5N25"
 };
 
-// 3. Firebase Servislerini Başlatıyoruz
+// 3. Firebase başlatma
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const analytics = getAnalytics(app);
 
-// 4. HTML'deki tablo gövdesini (tbody) seçiyoruz
+// 4. Tablo gövdesini seç
 const tableBody = document.getElementById('data-table-body');
 
-// 5. Veritabanındaki 'veri' düğümüne referans oluşturuyoruz
+// 5. Firebase veri yolu
 const dbRef = ref(database, 'veri');
 
-// 6. Realtime Database Canlı Veri Dinleyici
+// 6. Canlı veri dinleme
 onValue(dbRef, (snapshot) => {
-    // Tabloyu her güncellemede temizle (eski veriler üst üste binmesin)
+
     tableBody.innerHTML = "";
 
     if (snapshot.exists()) {
+
         const data = snapshot.val();
 
-        // 'veri' altındaki tüm bina nesnelerini döngüye alıyoruz
         for (let binaAdi in data) {
+
             const row = document.createElement('tr');
-            
-            // Binanın 'sayac' değerini alıyoruz, tanımlı değilse 0 yazıyoruz
-            const sayacDegeri = data[binaAdi].sayac !== undefined ? data[binaAdi].sayac : 0;
-            
-            // Satır HTML yapısı
+
+            const bina = data[binaAdi];
+
+            const adres = bina.adres !== undefined 
+                ? bina.adres 
+                : "-";
+
+            const sayacDegeri = bina.sayac !== undefined 
+                ? bina.sayac 
+                : 0;
+
             row.innerHTML = `
                 <td><strong>${binaAdi}</strong></td>
+                <td>${adres}</td>
                 <td>${sayacDegeri}</td>
             `;
-            
-            // Satırı tablo gövdesine ekliyoruz
+
             tableBody.appendChild(row);
         }
+
     } else {
-        tableBody.innerHTML = `<tr><td colspan="2" class="no-data">Hiç veri bulunamadı. Lütfen Firebase konsolunda ana düğüm adının 'veri' olduğunu doğrulayın.</td></tr>`;
+
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="3" class="no-data">
+                    Hiç veri bulunamadı.
+                </td>
+            </tr>
+        `;
+
     }
+
 }, (error) => {
-    console.error("Firebase veri okuma hatası: ", error);
-    tableBody.innerHTML = `<tr><td colspan="2" class="no-data" style="color: #ef4444;">Veriler alınamadı. Firebase Realtime Database Kurallarını (Rules) kontrol edin!</td></tr>`;
+
+    console.error("Firebase veri okuma hatası:", error);
+
+    tableBody.innerHTML = `
+        <tr>
+            <td colspan="3" class="no-data" style="color:#ef4444;">
+                Veriler alınamadı. Firebase Rules kontrol edilmeli.
+            </td>
+        </tr>
+    `;
+
 });
+```
