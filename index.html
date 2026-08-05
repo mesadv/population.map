@@ -18,7 +18,6 @@
             padding: 20px;
             box-sizing: border-box;
         }
-
         .container {
             width: 90%;
             max-width: 600px;
@@ -28,27 +27,23 @@
             border-radius: 12px;
             box-sizing: border-box;
         }
-
         h1 {
             text-align: center;
             color: #1f2937;
             margin-bottom: 20px;
             font-size: 1.5rem;
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
             background-color: #fff;
         }
-
         th, td {
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #e5e7eb;
         }
-
         th {
             background-color: #4CAF50;
             color: white;
@@ -57,18 +52,15 @@
             font-size: 0.85rem;
             letter-spacing: 0.05em;
         }
-
         tr:hover {
             background-color: #f9fafb;
         }
-
         .loading {
             text-align: center;
             color: #6b7280;
             font-style: italic;
             padding: 20px;
         }
-
         .no-data {
             text-align: center;
             color: #9ca3af;
@@ -76,7 +68,6 @@
         }
     </style>
 </head>
-
 <body>
 
     <div class="container">
@@ -89,18 +80,14 @@
                     <th>Sayaç / Nüfus</th>
                 </tr>
             </thead>
-
             <tbody id="data-table-body">
                 <tr>
-                    <td colspan="2" class="loading">
-                        Veriler Firebase'den yükleniyor...
-                    </td>
+                    <td colspan="2" class="loading">Veriler Firebase'den yükleniyor...</td>
                 </tr>
             </tbody>
         </table>
     </div>
 
     <script type="module" src="app.js"></script>
-
 </body>
 </html>
