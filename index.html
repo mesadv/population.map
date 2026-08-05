@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Population Map - Bina Listesi</title>
-
+    
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -21,7 +21,7 @@
 
         .container {
             width: 90%;
-            max-width: 900px;
+            max-width: 600px;
             background: white;
             padding: 30px;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -74,30 +74,25 @@
             color: #9ca3af;
             padding: 20px;
         }
-
-        /* Adres sütununun uzun metinlerde satır kırmasını sağlar */
-        td:nth-child(2) {
-            word-break: break-word;
-            white-space: normal;
-        }
     </style>
 </head>
+
 <body>
 
     <div class="container">
         <h1>Binalar Güncel Sayaç Listesi</h1>
-
+        
         <table>
             <thead>
                 <tr>
                     <th>Bina Adı</th>
-                    <th>Açık Adres</th>
-                    <th>Sayaç</th>
+                    <th>Sayaç / Nüfus</th>
                 </tr>
             </thead>
+
             <tbody id="data-table-body">
                 <tr>
-                    <td colspan="3" class="loading">
+                    <td colspan="2" class="loading">
                         Veriler Firebase'den yükleniyor...
                     </td>
                 </tr>
