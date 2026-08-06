@@ -3,151 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>BİKSS</title>
 
     <style>
-        * {
-            box-sizing: border-box;
+        *{
+            box-sizing:border-box;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            background-color: #f3f4f6;
-            margin: 0;
-            padding: 20px;
+        body{
+            margin:0;
+            padding:20px;
+            font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+            background:#f3f4f6;
         }
 
-        .container {
-            width: 100%;
-            max-width: 900px;
-            background: white;
-            padding: 30px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
+        .container{
+            max-width:1500px;
+            margin:auto;
+            background:#fff;
+            border-radius:12px;
+            box-shadow:0 10px 15px -3px rgba(0,0,0,.1);
+            padding:30px;
         }
 
-        h1 {
-            text-align: center;
-            color: #1f2937;
-            margin: 0 0 20px;
-            font-size: 1.5rem;
+        h1{
+            text-align:center;
+            color:#1f2937;
+            margin-bottom:25px;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            background-color: #fff;
-            table-layout: fixed;
+        .lists{
+            display:flex;
+            gap:20px;
         }
 
-        th,
-        td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #e5e7eb;
-            overflow-wrap: anywhere;
+        .panel{
+            flex:1;
+            border:1px solid #ddd;
+            border-radius:10px;
+            padding:15px;
+            background:#fafafa;
+        }
+
+        .panel h2{
+            margin-top:0;
+            margin-bottom:15px;
+            text-align:center;
+            color:#1f2937;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+            table-layout:fixed;
+            background:#fff;
+        }
+
+        th,td{
+            padding:12px;
+            border-bottom:1px solid #e5e7eb;
+            text-align:left;
+            word-break:break-word;
+        }
+
+        th{
+            background:#4CAF50;
+            color:white;
+            text-transform:uppercase;
+            font-size:13px;
         }
 
         th:nth-child(1),
-        td:nth-child(1) {
-            width: 30%;
+        td:nth-child(1){
+            width:30%;
         }
 
         th:nth-child(2),
-        td:nth-child(2) {
-            width: 50%;
+        td:nth-child(2){
+            width:50%;
         }
 
         th:nth-child(3),
-        td:nth-child(3) {
-            width: 20%;
-            text-align: center;
+        td:nth-child(3){
+            width:20%;
+            text-align:center;
         }
 
-        th {
-            background-color: #4CAF50;
-            color: white;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 0.05em;
-        }
-
-        tbody tr:hover {
-            background-color: #f9fafb;
+        tbody tr:hover{
+            background:#f9fafb;
         }
 
         .loading,
-        .no-data {
-            text-align: center;
-            color: #6b7280;
-            padding: 20px;
+        .no-data{
+            text-align:center;
+            color:#666;
+            padding:20px;
         }
 
-        .error {
-            color: red;
+        .site-box{
+            border:1px solid #ddd;
+            border-radius:8px;
+            margin-bottom:10px;
+            overflow:hidden;
+            background:white;
         }
 
-        @media (max-width: 600px) {
-            body {
-                padding: 10px;
+        .site-header{
+            background:#4CAF50;
+            color:white;
+            padding:12px;
+            cursor:pointer;
+            font-weight:bold;
+        }
+
+        .site-content{
+            display:none;
+            padding:10px;
+        }
+
+        .site-box.open .site-content{
+            display:block;
+        }
+
+        @media(max-width:900px){
+
+            .lists{
+                flex-direction:column;
             }
 
-            .container {
-                padding: 15px;
-            }
-
-            h1 {
-                font-size: 1.2rem;
-            }
-
-            th,
-            td {
-                padding: 10px 8px;
-                font-size: 0.85rem;
-            }
-
-            th {
-                font-size: 0.72rem;
-            }
         }
     </style>
 </head>
 
 <body>
 
-    <div class="container">
+<div class="container">
 
-        <h1>Bina İçi Kişi Sayma Sistemi</h1>
+    <h1>Bina İçi Kişi Sayma Sistemi</h1>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Bina Adı</th>
-                    <th>Açık Adres</th>
-                    <th>Kişi Sayısı</th>
-                </tr>
-            </thead>
+    <div class="lists">
 
-            <tbody id="data-table-body">
-                <tr>
-                    <td colspan="3" class="loading">
-                        Veriler Firebase'den yükleniyor...
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <!-- SOL TARAF -->
+        <div class="panel">
+
+            <h2>🏘️ Siteler</h2>
+
+            <div id="sites-container">
+
+                <div class="site-box">
+
+                    <div class="site-header">
+                        Güneş Sitesi
+                    </div>
+
+                    <div class="site-content">
+
+                        <table>
+
+                            <thead>
+                                <tr>
+                                    <th>Bina</th>
+                                    <th>Adres</th>
+                                    <th>Kişi</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                <tr>
+                                    <td colspan="3" class="loading">
+                                        Henüz veri yok...
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- SAĞ TARAF -->
+
+        <div class="panel">
+
+            <h2>🏢 Apartmanlar</h2>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Bina Adı</th>
+                        <th>Açık Adres</th>
+                        <th>Kişi Sayısı</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="apartments-table-body">
+
+                    <tr>
+
+                        <td colspan="3" class="loading">
+                            Veriler Firebase'den yükleniyor...
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
 
     </div>
 
-    <script type="module" src="app.js"></script>
+</div>
+
+<script>
+document.addEventListener("click",function(e){
+
+    if(e.target.classList.contains("site-header")){
+
+        e.target.parentElement.classList.toggle("open");
+
+    }
+
+});
+</script>
+
+<script type="module" src="app.js"></script>
 
 </body>
 </html>
