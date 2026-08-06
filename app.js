@@ -21,103 +21,48 @@ const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 getAnalytics(app);
 
-const sitesContainer = document.getElementById("sites-container");
-const apartmentsTable = document.getElementById("apartments-table-body");
+window.addEventListener("DOMContentLoaded", () => {
 
-const dbRef = ref(database, "veri");
+    const sitesContainer = document.getElementById("sites-container");
+    const apartmentsTable = document.getElementById("apartments-table-body");
 
-onValue(dbRef, (snapshot) => {
-
-    sitesContainer.innerHTML = "";
-    apartmentsTable.innerHTML = "";
-
-    if (!snapshot.exists()) {
-
-        apartmentsTable.innerHTML = `
-            <tr>
-                <td colspan="3" class="no-data">
-                    Veri bulunamadı.
-                </td>
-            </tr>
-        `;
-
+    if (!sitesContainer) {
+        console.error("sites-container bulunamadı!");
         return;
     }
 
-    const data = snapshot.val();
+    if (!apartmentsTable) {
+        console.error("apartments-table-body bulunamadı!");
+        return;
+    }
 
-    /* ---------------- APARTMANLAR ---------------- */
+    const dbRef = ref(database, "veri");
 
-    if (data.apartmanlar) {
+    onValue(dbRef, (snapshot) => {
 
-        Object.entries(data.apartmanlar).forEach(([isim, bina]) => {
+        sitesContainer.innerHTML = "";
+        apartmentsTable.innerHTML = "";
 
-            const adres =
-                bina.adres ??
-                bina.acikAdres ??
-                bina["açıkAdres"] ??
-                "-";
+        if (!snapshot.exists()) {
 
-            const kisi =
-                bina.kisiSayisi ??
-                bina["kişiSayisi"] ??
-                bina.sayac ??
-                bina["sayaç"] ??
-                0;
-
-            apartmentsTable.innerHTML += `
+            apartmentsTable.innerHTML = `
                 <tr>
-                    <td><strong>${isim}</strong></td>
-                    <td>${adres}</td>
-                    <td>${kisi}</td>
+                    <td colspan="3" class="no-data">
+                        Veri bulunamadı.
+                    </td>
                 </tr>
             `;
 
-        });
+            return;
+        }
 
-    } else {
+        const data = snapshot.val();
 
-        apartmentsTable.innerHTML = `
-            <tr>
-                <td colspan="3" class="no-data">
-                    Apartman bulunamadı.
-                </td>
-            </tr>
-        `;
+        /* ================= APARTMANLAR ================= */
 
-    }
+        if (data.apartmanlar) {
 
-    /* ---------------- SİTELER ---------------- */
-
-    if (data.siteler) {
-
-        Object.entries(data.siteler).forEach(([siteAdi, binalar]) => {
-
-            let toplam = 0;
-
-            const siteBox = document.createElement("div");
-            siteBox.className = "site-box";
-
-            const siteHeader = document.createElement("div");
-            siteHeader.className = "site-header";
-            siteHeader.textContent = "▶ " + siteAdi;
-
-            const siteContent = document.createElement("div");
-            siteContent.className = "site-content";
-
-            let html = `
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Bina</th>
-                            <th>Adres</th>
-                            <th>Kişi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            Object.entries(binalar).forEach(([binaAdi, bina]) => {
+            Object.entries(data.apartmanlar).forEach(([isim, bina]) => {
 
                 const adres =
                     bina.adres ??
@@ -132,11 +77,9 @@ onValue(dbRef, (snapshot) => {
                     bina["sayaç"] ??
                     0;
 
-                toplam += Number(kisi);
-
-                html += `
+                apartmentsTable.innerHTML += `
                     <tr>
-                        <td><strong>${binaAdi}</strong></td>
+                        <td><strong>${isim}</strong></td>
                         <td>${adres}</td>
                         <td>${kisi}</td>
                     </tr>
@@ -144,38 +87,107 @@ onValue(dbRef, (snapshot) => {
 
             });
 
-            html += `
-                    </tbody>
-                </table>
+        } else {
+
+            apartmentsTable.innerHTML = `
+                <tr>
+                    <td colspan="3" class="no-data">
+                        Apartman bulunamadı.
+                    </td>
+                </tr>
             `;
 
-            siteContent.innerHTML = html;
+        }
 
-            siteHeader.onclick = () => {
+        /* ================= SİTELER ================= */
 
-                siteBox.classList.toggle("open");
+        if (data.siteler) {
 
-                if(siteBox.classList.contains("open")){
-                    siteHeader.textContent =
-                        "▼ " + siteAdi + " (" + toplam + " kişi)";
-                }else{
-                    siteHeader.textContent =
-                        "▶ " + siteAdi;
-                }
+            Object.entries(data.siteler).forEach(([siteAdi, binalar]) => {
 
-            };
+                let toplam = 0;
 
-            siteBox.appendChild(siteHeader);
-            siteBox.appendChild(siteContent);
+                const siteBox = document.createElement("div");
+                siteBox.className = "site-box";
 
-            sitesContainer.appendChild(siteBox);
+                const header = document.createElement("div");
+                header.className = "site-header";
+                header.textContent = "▶ " + siteAdi;
 
-        });
+                const content = document.createElement("div");
+                content.className = "site-content";
 
-    }
+                let html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Bina</th>
+                                <th>Adres</th>
+                                <th>Kişi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
 
-}, (error)=>{
+                Object.entries(binalar).forEach(([binaAdi, bina]) => {
 
-    console.error(error);
+                    const adres =
+                        bina.adres ??
+                        bina.acikAdres ??
+                        bina["açıkAdres"] ??
+                        "-";
+
+                    const kisi =
+                        bina.kisiSayisi ??
+                        bina["kişiSayisi"] ??
+                        bina.sayac ??
+                        bina["sayaç"] ??
+                        0;
+
+                    toplam += Number(kisi);
+
+                    html += `
+                        <tr>
+                            <td>${binaAdi}</td>
+                            <td>${adres}</td>
+                            <td>${kisi}</td>
+                        </tr>
+                    `;
+
+                });
+
+                html += `
+                        </tbody>
+                    </table>
+                `;
+
+                content.innerHTML = html;
+
+                header.addEventListener("click", () => {
+
+                    siteBox.classList.toggle("open");
+
+                    if (siteBox.classList.contains("open")) {
+                        header.textContent = `▼ ${siteAdi} (${toplam} kişi)`;
+                    } else {
+                        header.textContent = `▶ ${siteAdi}`;
+                    }
+
+                });
+
+                siteBox.appendChild(header);
+                siteBox.appendChild(content);
+
+                sitesContainer.appendChild(siteBox);
+
+            });
+
+        }
+
+    }, (error) => {
+
+        console.error("Firebase Hatası:", error);
+
+    });
 
 });
